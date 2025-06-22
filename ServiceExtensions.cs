@@ -15,7 +15,7 @@ public static class ServiceExtensions
             .AddTransient<ToolDiscoveryService>();
         return services;
     }
-    public static IServiceCollection RegisterPublicUploadServices(this IServiceCollection services)
+    public static IServiceCollection RegisterPublicToolUploadServices(this IServiceCollection services)
     {
         services.AddSingleton<IToolsContext, FileToolsContext>()
             .AddSingleton<IUploadedToolsStorage, FileUploadedToolsStorage>()
