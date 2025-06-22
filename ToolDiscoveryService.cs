@@ -3,9 +3,7 @@ public class ToolDiscoveryService(IToolsContext context, IToolDiscoveryHandler h
 {
     public async Task AddToolAsync(NuGetToolModel tool)
     {
-        //iffy because different program for doing tools.
-        //i may have to 
-        string programPath = bb1.Configuration!.GetFeedPostProcessorProgramFromConfig();
+        string programPath = bb1.Configuration!.GetToolPostBuildFeedProcessorProgram();
         //even if i add to the list as i go along, should not be bad.
         CsProjEditor editor = new(tool.CsProjPath);
         editor.RemovePostBuildCommand();
