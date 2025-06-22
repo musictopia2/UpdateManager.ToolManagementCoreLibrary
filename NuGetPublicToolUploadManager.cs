@@ -5,20 +5,20 @@ public class NuGetPublicToolUploadManager(IToolsContext toolsContext,
     )
 {
     // The method that does all the work of checking, uploading, and tracking
-    public async Task UploadPackagesAsync(CancellationToken cancellationToken = default)
+    public async Task UploadToolsAsync(CancellationToken cancellationToken = default)
     {
         string feedUrl = bb1.Configuration!.GetStagingPackagePath();
-        BasicList<UploadToolModel> list = await GetUploadedPackagesAsync(feedUrl, cancellationToken);
+        BasicList<UploadToolModel> list = await GetUploadedToolsAsync(feedUrl, cancellationToken);
         list = list.ToBasicList(); //try to make a copy here too.
-        await UploadPackagesAsync(list, cancellationToken);
-        await CheckPackagesAsync(list, feedUrl);
+        await UploadToolsAsync(list, cancellationToken);
+        await CheckToolsAsync(list, feedUrl);
     }
-    public async Task<bool> HasItemsToProcessAsync()
+    public async Task<bool> UploadToolsAsync()
     {
         var list = await uploadContext.GetAllUploadedToolsAsync();
         return list.Count > 0;
     }
-    private async Task UploadPackagesAsync(BasicList<UploadToolModel> tools, CancellationToken cancellationToken)
+    private async Task UploadToolsAsync(BasicList<UploadToolModel> tools, CancellationToken cancellationToken)
     {
         await tools.ForConditionalItemsAsync(x => x.Uploaded == false, async item =>
         {
@@ -32,7 +32,7 @@ public class NuGetPublicToolUploadManager(IToolsContext toolsContext,
             }
         });
     }
-    private async Task CheckPackagesAsync(BasicList<UploadToolModel> tools, string feedUrl)
+    private async Task CheckToolsAsync(BasicList<UploadToolModel> tools, string feedUrl)
     {
         await tools.ForConditionalItemsAsync(x => x.Uploaded, async item =>
         {
@@ -47,7 +47,7 @@ public class NuGetPublicToolUploadManager(IToolsContext toolsContext,
             }
         });
     }
-    private async Task<BasicList<UploadToolModel>> GetUploadedPackagesAsync(string feedUrl, CancellationToken cancellationToken)
+    private async Task<BasicList<UploadToolModel>> GetUploadedToolsAsync(string feedUrl, CancellationToken cancellationToken)
     {
         var stagingTools = await LocalNuGetFeedManager.GetAllPackagesAsync(feedUrl, cancellationToken);
         var allPackages = await toolsContext.GetToolsAsync();
