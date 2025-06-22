@@ -9,7 +9,7 @@ public static class ServiceExtensions
             ; //for now, just one.
         return services;
     }
-    public static IServiceCollection RegisterPackageDiscoveryServices(this IServiceCollection services)
+    public static IServiceCollection RegisterToolDiscoveryServices(this IServiceCollection services)
     {
         services.AddTransient<IToolsContext, FileToolsContext>()
             .AddTransient<ToolDiscoveryService>();

@@ -102,10 +102,12 @@ public class PrivateToolDeploymentProcessor(IToolsContext context, INugetPacker 
         {
             throw new CustomBasicException("Failed to publish nuget package to private feed");
         }
+        await NuGetToolManager.InstallToolAsync(tool.GetPackageID(), tool.Version);
     }
     private async Task UpdatePackageVersionAsync(NuGetToolModel package)
     {
         string version = package.Version.IncrementMinorVersion();
+        await NuGetToolManager.UninstallToolAsync(package.GetPackageID());
         await context.UpdateToolVersionAsync(package.PackageName, version);
     }
     private static string GetFeedToUse(NuGetToolModel package)
