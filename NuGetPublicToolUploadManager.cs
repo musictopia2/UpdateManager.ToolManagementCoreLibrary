@@ -13,7 +13,7 @@ public class NuGetPublicToolUploadManager(IToolsContext toolsContext,
         await UploadToolsAsync(list, cancellationToken);
         await CheckToolsAsync(list, feedUrl);
     }
-    public async Task<bool> UploadToolsAsync()
+    public async Task<bool> HasItemsToProcessAsync()
     {
         var list = await uploadContext.GetAllUploadedToolsAsync();
         return list.Count > 0;
