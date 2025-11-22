@@ -3,7 +3,7 @@ public class ToolDiscoveryService(IToolsContext context, IToolDiscoveryHandler h
 {
     public async Task AddToolAsync(NuGetToolModel tool)
     {
-        string programPath = bb1.Configuration!.GetToolPostBuildFeedProcessorProgram();
+        string programPath = bb1.Configuration!.ToolPostBuildFeedProcessorProgram;
         //even if i add to the list as i go along, should not be bad.
         CsProjEditor editor = new(tool.CsProjPath);
         editor.RemovePostBuildCommand();
@@ -21,8 +21,8 @@ public class ToolDiscoveryService(IToolsContext context, IToolDiscoveryHandler h
         BasicList<NuGetToolModel> existingTools = await context.GetToolsAsync();
         var existingPackageNames = new HashSet<string>(existingTools.Select(p => p.PackageName));
         BasicList<string> folders = await handler.GetToolDirectoriesAsync();
-        string netVersion = bb1.Configuration!.GetNetVersion();
-        string prefixName = bb1.Configuration!.GetPackagePrefixFromConfig();
+        string netVersion = bb1.Configuration!.NetVersion;
+        string prefixName = bb1.Configuration!.PackagePrefixFromConfig;
         foreach (var folder in folders)
         {
             if (ff1.DirectoryExists(folder) == false)

@@ -7,8 +7,8 @@ public class PrivateToolDeploymentProcessor(IToolsContext context, INugetPacker 
         try
         {
             var configuration = bb1.Configuration ?? throw new CustomBasicException("Configuration is not initialized.");
-            string netVersion = configuration.GetNetVersion();
-            string prefixName = bb1.Configuration!.GetPackagePrefixFromConfig();
+            string netVersion = configuration.NetVersion;
+            string prefixName = bb1.Configuration!.PackagePrefixFromConfig;
             BasicList<NuGetToolModel> tools = await context.GetToolsAsync();
             NuGetToolModel? tool = tools.SingleOrDefault(x => x.PackageName == arguments.ProjectName);
             bool rets;
@@ -19,7 +19,7 @@ public class PrivateToolDeploymentProcessor(IToolsContext context, INugetPacker 
                     return; //this means can return because you are ignoring.
                 }
                 
-                string directory = tool.GetRepositoryDirectory();
+                string directory = tool.RepositoryDirectory;
                 rets = await GitBranchManager.IsOnDefaultBranchAsync(directory);
                 if (rets == false)
                 {
@@ -37,7 +37,7 @@ public class PrivateToolDeploymentProcessor(IToolsContext context, INugetPacker 
                 handler.CustomizePackageModel(tool);
                 tool.PackageName = arguments.ProjectName;
                 tool.CsProjPath = Path.Combine(arguments.ProjectDirectory, arguments.ProjectFile);
-                string directory = tool.GetRepositoryDirectory();
+                string directory = tool.RepositoryDirectory;
                 rets = await GitBranchManager.IsOnDefaultBranchAsync(directory);
                 if (rets == false)
                 {
@@ -69,7 +69,7 @@ public class PrivateToolDeploymentProcessor(IToolsContext context, INugetPacker 
             await CreateAndUploadNuGetPackageAsync(tool);
             if (tool.Development == false)
             {
-                string developmentFeed = configuration.GetDevelopmentPackagePath();
+                string developmentFeed = configuration.DevelopmentPackagePath;
                 await LocalNuGetFeedManager.DeletePackageFolderAsync(developmentFeed, tool.PackageName); //if its not there, just ignore.
             }
         }
@@ -102,19 +102,19 @@ public class PrivateToolDeploymentProcessor(IToolsContext context, INugetPacker 
         {
             throw new CustomBasicException("Failed to publish nuget package to private feed");
         }
-        await NuGetToolManager.InstallToolAsync(tool.GetPackageID(), tool.Version);
+        await NuGetToolManager.InstallToolAsync(tool.PackageID, tool.Version);
     }
     private async Task UpdatePackageVersionAsync(NuGetToolModel package)
     {
         string version = package.Version.IncrementMinorVersion();
-        await NuGetToolManager.UninstallToolAsync(package.GetPackageID());
+        await NuGetToolManager.UninstallToolAsync(package.PackageID);
         await context.UpdateToolVersionAsync(package.PackageName, version);
     }
     private static string GetFeedToUse(NuGetToolModel package)
     {
-        string stagingPath = bb1.Configuration!.GetStagingPackagePath();
-        string developmentPath = bb1.Configuration!.GetDevelopmentPackagePath();
-        string localPath = bb1.Configuration!.GetPrivatePackagePath();
+        string stagingPath = bb1.Configuration!.StagingPackagePath;
+        string developmentPath = bb1.Configuration!.DevelopmentPackagePath;
+        string localPath = bb1.Configuration!.PrivatePackagePath;
         if (package.Development)
         {
             return developmentPath;

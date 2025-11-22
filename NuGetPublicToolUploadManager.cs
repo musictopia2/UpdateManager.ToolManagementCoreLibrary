@@ -7,7 +7,7 @@ public class NuGetPublicToolUploadManager(IToolsContext toolsContext,
     // The method that does all the work of checking, uploading, and tracking
     public async Task UploadToolsAsync(CancellationToken cancellationToken = default)
     {
-        string feedUrl = bb1.Configuration!.GetStagingPackagePath();
+        string feedUrl = bb1.Configuration!.StagingPackagePath;
         BasicList<UploadToolModel> list = await GetUploadedToolsAsync(feedUrl, cancellationToken);
         list = list.ToBasicList(); //try to make a copy here too.
         await UploadToolsAsync(list, cancellationToken);
@@ -57,13 +57,13 @@ public class NuGetPublicToolUploadManager(IToolsContext toolsContext,
         foreach (var name in stagingTools)
         {
             //this means needs to add package.
-            var ourPackage = allPackages.SingleOrDefault(x => x.GetPackageID().Equals(name, StringComparison.CurrentCultureIgnoreCase));
+            var ourPackage = allPackages.SingleOrDefault(x => x.PackageID.Equals(name, StringComparison.CurrentCultureIgnoreCase));
             var uploadedPackage = uploadedPackages.SingleOrDefault(x => x.PackageId.Equals(name, StringComparison.CurrentCultureIgnoreCase));
             //i am guessing if you are now temporarily ignoring it, still okay to process because it was the past.
             //same thing for development.
             if (uploadedPackage is null && ourPackage is not null)
             {
-                string packageId = ourPackage.GetPackageID();
+                string packageId = ourPackage.PackageID;
                 uploadedPackage = new()
                 {
                     PackageId = packageId,

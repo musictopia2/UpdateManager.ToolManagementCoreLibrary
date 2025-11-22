@@ -1,26 +1,30 @@
 ﻿namespace UpdateManager.ToolManagementCoreLibrary;
 public static class ServiceExtensions
 {
-    public static IServiceCollection RegisterPostBuildServices(this IServiceCollection services)
+    extension(IServiceCollection services)
     {
-        services.AddSingleton<IToolsContext, FileToolsContext>()
-            .AddSingleton<INugetPacker, NugetPacker>()
-            .AddSingleton<PrivateToolDeploymentProcessor>()
-            ; //for now, just one.
-        return services;
+        public IServiceCollection RegisterPostBuildServices()
+        {
+            services.AddSingleton<IToolsContext, FileToolsContext>()
+                .AddSingleton<INugetPacker, NugetPacker>()
+                .AddSingleton<PrivateToolDeploymentProcessor>()
+                ; //for now, just one.
+            return services;
+        }
+        public IServiceCollection RegisterToolDiscoveryServices()
+        {
+            services.AddTransient<IToolsContext, FileToolsContext>()
+                .AddTransient<ToolDiscoveryService>();
+            return services;
+        }
+        public IServiceCollection RegisterPublicToolUploadServices()
+        {
+            services.AddSingleton<IToolsContext, FileToolsContext>()
+                .AddSingleton<IUploadedToolsStorage, FileUploadedToolsStorage>()
+                .AddSingleton<INugetUploader, PublicNugetUploader>()
+                .AddSingleton<NuGetPublicToolUploadManager>();
+            return services;
+        }
     }
-    public static IServiceCollection RegisterToolDiscoveryServices(this IServiceCollection services)
-    {
-        services.AddTransient<IToolsContext, FileToolsContext>()
-            .AddTransient<ToolDiscoveryService>();
-        return services;
-    }
-    public static IServiceCollection RegisterPublicToolUploadServices(this IServiceCollection services)
-    {
-        services.AddSingleton<IToolsContext, FileToolsContext>()
-            .AddSingleton<IUploadedToolsStorage, FileUploadedToolsStorage>()
-            .AddSingleton<INugetUploader, PublicNugetUploader>()
-            .AddSingleton<NuGetPublicToolUploadManager>();
-        return services;
-    }
+    
 }
