@@ -23,7 +23,7 @@ public class NuGetPublicToolUploadManager(IToolsContext toolsContext,
         await tools.ForConditionalItemsAsync(x => x.Uploaded == false, async item =>
         {
             bool rets;
-            rets = await uploader.UploadNugetPackageAsync(item.NugetFilePath, cancellationToken);
+            rets = await uploader.UploadNugetPackageAsync(item.NugetFilePath, item.PackageId, item.Version, cancellationToken);
             if (rets)
             {
                 item.Uploaded = true;

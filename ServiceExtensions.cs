@@ -17,12 +17,14 @@ public static class ServiceExtensions
                 .AddTransient<ToolDiscoveryService>();
             return services;
         }
-        public IServiceCollection RegisterPublicToolUploadServices()
+        public IServiceCollection RegisterPublicToolUploadServices<TUploader>()
+            where TUploader : class, INugetUploader
         {
             services.AddSingleton<IToolsContext, FileToolsContext>()
                 .AddSingleton<IUploadedToolsStorage, FileUploadedToolsStorage>()
-                .AddSingleton<INugetUploader, PublicNugetUploader>()
+                .AddSingleton<INugetUploader, TUploader>()
                 .AddSingleton<NuGetPublicToolUploadManager>();
+
             return services;
         }
     }
