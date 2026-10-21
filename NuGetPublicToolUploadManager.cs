@@ -13,10 +13,20 @@ public class NuGetPublicToolUploadManager(IToolsContext toolsContext,
         await UploadToolsAsync(list, cancellationToken);
         await CheckToolsAsync(list, feedUrl);
     }
-    public async Task<bool> HasItemsToProcessAsync()
+
+    public async Task<bool> HasItemsToProcessAsync(
+    CancellationToken cancellationToken = default)
     {
-        var list = await uploadContext.GetAllUploadedToolsAsync();
-        return list.Count > 0;
+        string feedUrl = bb1.Configuration!.StagingPackagePath;
+
+        var stagingTools =
+            await LocalNuGetFeedManager.GetAllPackagesAsync(
+                feedUrl, cancellationToken);
+
+        var trackedTools =
+            await uploadContext.GetAllUploadedToolsAsync();
+
+        return stagingTools.Any() || trackedTools.Count > 0;
     }
     private async Task UploadToolsAsync(BasicList<UploadToolModel> tools, CancellationToken cancellationToken)
     {
@@ -30,6 +40,10 @@ public class NuGetPublicToolUploadManager(IToolsContext toolsContext,
                 await uploadContext.UpdateUploadedToolAsync(item); //update this one since it was not uploaded
                 Console.WriteLine("Your package was pushed");
             }
+            else
+                throw new InvalidOperationException(
+                    $"Failed to upload {item.PackageId} version {item.Version}. " +
+                    "Check GitHub Actions for failure details.");
         });
     }
     private async Task CheckToolsAsync(BasicList<UploadToolModel> tools, string feedUrl)
