@@ -41,9 +41,11 @@ public class NuGetPublicToolUploadManager(IToolsContext toolsContext,
                 Console.WriteLine("Your package was pushed");
             }
             else
+            {
                 throw new InvalidOperationException(
                     $"Failed to upload {item.PackageId} version {item.Version}. " +
                     "Check GitHub Actions for failure details.");
+            }
         });
     }
     private async Task CheckToolsAsync(BasicList<UploadToolModel> tools, string feedUrl)
